@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulseCheck — System Diagnostics Dashboard</title>
+    <!-- Outfit Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="glass-bg-decorations">
+        <div class="circle circle-1"></div>
+        <div class="circle circle-2"></div>
+        <div class="circle circle-3"></div>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="brand">
+                <div class="pulse-indicator-large"></div>
+                <div class="logo-text">
+                    <h1>PULSE<span>CHECK</span></h1>
+                    <p class="tagline">Automated Environment Diagnostics</p>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="refresh-toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="auto-refresh-toggle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                    <span class="control-label">Auto-Poll (5s)</span>
+                </div>
+                <button id="manual-refresh-btn" class="btn btn-primary" title="Trigger full diagnostic checks now">
+                    <i class="fa-solid fa-arrows-rotate mr-2" id="refresh-icon"></i>
+                    <span>Diagnose</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Status Overview Banner -->
+        <section class="status-banner-card" id="status-banner">
+            <div class="status-banner-content">
+                <div class="status-icon-wrapper">
+                    <i class="fa-solid fa-shield-halved" id="status-shield"></i>
+                </div>
+                <div class="status-info">
+                    <span class="status-label">Overall Environment Health</span>
+                    <h2 id="overall-status-text">INITIALIZING DIAGNOSTICS...</h2>
+                </div>
+            </div>
+            <div class="timestamp-info">
+                <span>Last Scan:</span>
+                <strong id="last-update-time">--:--:--</strong>
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <main class="dashboard-grid">
+            
+            <!-- Left Side: System Metrics -->
+            <section class="grid-col system-metrics-section">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-server section-icon"></i>Host Performance</h2>
+                </div>
+                
+                <div class="metrics-card-grid">
+                    <!-- CPU Card -->
+                    <div class="metric-card glass-card">
+                        <div class="metric-card-header">
+                            <span>CPU Utilization</span>
+                            <i class="fa-solid fa-microchip metric-icon"></i>
+                        </div>
+                        <div class="radial-gauge-container">
+                            <svg viewBox="0 0 100 100" class="radial-gauge">
+                                <circle class="gauge-bg" cx="50" cy="50" r="40" />
+                                <circle class="gauge-fill" id="cpu-gauge-fill" cx="50" cy="50" r="40" style="stroke-dasharray: 251.2; stroke-dashoffset: 251.2;" />
+                            </svg>
+                            <div class="gauge-value" id="cpu-value">--%</div>
+                        </div>
+                    </div>
+
+                    <!-- RAM Card -->
+                    <div class="metric-card glass-card">
+                        <div class="metric-card-header">
+                            <span>RAM Usage</span>
+                            <i class="fa-solid fa-memory metric-icon"></i>
+                        </div>
+                        <div class="bar-gauge-container">
+                            <div class="metric-display-main" id="ram-value">--%</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill" id="ram-bar-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="metric-details">
+                                <span id="ram-used-bytes">-- GB</span>
+                                <span>of</span>
+                                <span id="ram-total-bytes">-- GB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Disk Card -->
+                    <div class="metric-card glass-card">
+                        <div class="metric-card-header">
+                            <span>Disk Volume</span>
+                            <i class="fa-solid fa-hard-drive metric-icon"></i>
+                        </div>
+                        <div class="bar-gauge-container">
+                            <div class="metric-display-main" id="disk-value">--%</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill" id="disk-bar-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="metric-details">
+                                <span id="disk-free-bytes">-- GB</span>
+                                <span>free of</span>
+                                <span id="disk-total-bytes">-- GB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uptime Card -->
+                    <div class="metric-card glass-card">
+                        <div class="metric-card-header">
+                            <span>System Uptime</span>
+                            <i class="fa-solid fa-clock-rotate-left metric-icon"></i>
+                        </div>
+                        <div class="uptime-container">
+                            <div class="uptime-text" id="uptime-value">0d 0h 0m 0s</div>
+                            <div class="metric-subtitle">Since microservice started</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Side: API Endpoint Health Checks -->
+            <section class="grid-col api-endpoints-section">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-network-wired section-icon"></i>Dependency Services</h2>
+                </div>
+                
+                <div class="services-list glass-card" id="services-container">
+                    <div class="loading-state">
+                        <i class="fa-solid fa-spinner fa-spin loading-spinner"></i>
+                        <p>Polling dependencies...</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Downward section for Code logs / developer view -->
+        <section class="json-inspector-section glass-card">
+            <div class="inspector-header" id="json-toggle">
+                <h3><i class="fa-solid fa-terminal mr-2"></i>Diagnostics JSON Payload</h3>
+                <div class="inspector-actions">
+                    <button class="btn btn-secondary btn-sm" id="copy-json-btn" title="Copy raw JSON responses">
+                        <i class="fa-regular fa-copy"></i>
+                    </button>
+                    <i class="fa-solid fa-chevron-down toggle-arrow" id="inspector-arrow"></i>
+                </div>
+            </div>
+            <div class="inspector-body collapsed" id="json-body">
+                <pre><code id="json-preview" class="language-json">{}</code></pre>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>PulseCheck Internal Tooling • Version 1.0.0</p>
+            <div class="footer-links">
+                <a href="/docs" target="_blank" class="footer-link"><i class="fa-solid fa-book mr-1"></i>Swagger Docs</a>
+                <span class="bullet">•</span>
+                <a href="https://github.com" target="_blank" class="footer-link"><i class="fa-brands fa-github mr-1"></i>Repository</a>
+            </div>
+        </footer>
+    </div>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

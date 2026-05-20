@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  pulsecheck:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: pulsecheck:local
+    container_name: pulsecheck_app
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV=development
+    restart: unless-stopped
