@@ -31,7 +31,7 @@ jobs:
 
     - name: Run PyTest Suite
       run: |
-        pytest app/tests/test_main.py -v
+        python -m pytest app/tests/test_main.py -v
 
   docker-build:
     needs: test
