@@ -29,7 +29,7 @@ pipeline {
                     . .venv/bin/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
-                    PYTHONPATH=. python3 -m pytest app/tests/test_main.py -v
+                    python3 -m pytest app/tests/test_main.py -v
                 '''
             }
         }
@@ -124,3 +124,4 @@ pipeline {
         }
     }
 }
+
