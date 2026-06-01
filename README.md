@@ -10,11 +10,50 @@ PulseCheck is a lightweight, automated system and API health-monitoring microser
 ---
 ## 🏗️ Project Architecture
 ```mermaid
-graph TD
-    User[Web Client] -->|Port 80| ALB[AWS Application Load Balancer]
-    ALB -->|Target Group Port 8000| ECS[ECS Fargate Tasks]
-    ECS -->|Internal Diagnostics| System[Host Stats: CPU, RAM, Disk]
-    ECS -->|HTTPS Probes| ExternalAPIs[GitHub / DNS Endpoints]
+graph TB
+    %% Nodes and Styles Configuration
+    classDef default fill:#121420,stroke:#3b4252,stroke-width:1px,color:#f1f5f9;
+    classDef user fill:#00f2fe,stroke:#00f2fe,stroke-width:2px,color:#090a0f;
+    classDef aws fill:#ff9f43,stroke:#ff9f43,stroke-width:1px,color:#090a0f;
+    classDef pipeline fill:#4facfe,stroke:#4facfe,stroke-width:1px,color:#090a0f;
+    classDef internal fill:#00f5a0,stroke:#00f5a0,stroke-width:1px,color:#090a0f;
+    classDef external fill:#ff3366,stroke:#ff3366,stroke-width:1px,color:#090a0f;
+    %% Subgraphs
+    subgraph LocalSandbox ["💻 Local Developer Environment"]
+        Developer["👨‍💻 Engineer"] -->|"1. Exec Run"| PS[("run_pipeline.ps1")]
+        PS -->|"2. Tests & Compile"| PythonEnv["Python Venv / Pytest"]
+        PS -->|"3. Container Verification"| LocalDocker["Local Docker Build<br>(Port 8088 E2E)"]
+        PS -->|"4. Write Metrics"| JSONFile["app/static/pipeline_status.json"]
+        Browser["🌐 Browser"] -->|"Reads UI & Live Timeline"| JSONFile
+        Browser -->|"GET /health"| LocalUvicorn["FastAPI / Uvicorn Server<br>(Port 8000)"]
+    end
+    subgraph GitHubAutomation ["⛓️ Automated CI/CD Pipelines"]
+        Developer -->|"git push"| GHA["GitHub Actions (ci.yml)"]
+        GHA -->|"Syntax check & PyTest"| GHA_Test["Test Runner"]
+        GHA_Test -->|"Build & Tag Image"| GHA_Build["Docker Buildx"]
+        GHA_Build -->|"Push Container"| ECR[("Amazon ECR<br>Repository")]
+        GHA_Build -->|"Deploy Update"| ECS_Service["ECS Fargate Service"]
+    end
+    subgraph AWSCloud ["☁️ AWS Cloud Infrastructure (dev / staging / prod)"]
+        Client["📱 Public User / Client"] -->|"HTTP Port 80"| ALB["Application Load Balancer (ALB)"]
+        ALB -->|"Route Traffic"| TG["Target Group"]
+        TG -->|"Port 8000 (Fargate)"| ECS_Service
+        
+        subgraph FargateTask ["ECS Fargate Task"]
+            ECS_Service --> Container["PulseCheck Container"]
+            Container -->|"Write Logs"| CloudWatch[("CloudWatch Log Group")]
+        end
+    end
+    subgraph TargetMetrics ["🩺 Diagnostics Targets"]
+        Container & LocalUvicorn & LocalDocker -->|"System metrics (psutil)"| HostResources["Host stats (CPU, RAM, Disk)"]
+        Container & LocalUvicorn & LocalDocker -->|"HTTP async queries (httpx)"| DownstreamAPIs["Downstream APIs (GitHub, Cloudflare)"]
+    end
+    %% Class Connections
+    class Developer,Browser,Client user;
+    class GHA,GHA_Test,GHA_Build pipeline;
+    class ALB,TG,ECS_Service,Container,ECR,CloudWatch aws;
+    class HostResources internal;
+    class DownstreamAPIs external;
 ```
 ---
 ## 📂 Project Structure
