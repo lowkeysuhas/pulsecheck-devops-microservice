@@ -38,11 +38,11 @@ pipeline {
             steps {
                 echo 'Spinning up container inside virtualized network to run diagnostics probes...'
                 sh """
-                    docker run -d -p 8080:8000 --name pulsecheck_test_jenkins ${IMAGE_NAME}:${IMAGE_TAG}
+                    docker run -d -p 8085:8000 --name pulsecheck_test_jenkins ${IMAGE_NAME}:${IMAGE_TAG}
                     sleep 5
                     
                     # Call API probe
-                    curl -f http://localhost:8080/health
+                    curl -f http://localhost:8085/health
                     
                     # Cleanup
                     docker stop pulsecheck_test_jenkins
