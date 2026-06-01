@@ -85,6 +85,7 @@ async function fetchDiagnostics(isManual = false) {
         const data = await response.json();
         
         updateDashboard(data);
+        await fetchPipelineStatus();
     } catch (error) {
         console.error("PulseCheck API Fetch Error: ", error);
         showConnectionError();
@@ -217,4 +218,59 @@ function formatUptime(seconds) {
     const sDisplay = `${s}s`;
     
     return dDisplay + hDisplay + mDisplay + sDisplay;
+}
+
+async function fetchPipelineStatus() {
+    try {
+        const response = await fetch("/api/pipeline");
+        const data = await response.json();
+        updatePipelineUI(data);
+    } catch (error) {
+        console.error("PulseCheck Pipeline API Fetch Error: ", error);
+    }
+}
+
+function updatePipelineUI(data) {
+    const badge = document.getElementById("pipeline-status-badge");
+    const triggerText = document.getElementById("pipeline-trigger-text");
+    const timeText = document.getElementById("pipeline-time-text");
+    const container = document.getElementById("pipeline-flow-container");
+
+    if (!badge || !triggerText || !timeText || !container) return;
+
+    // Update global status badge
+    badge.textContent = data.status.replace("_", " ");
+    badge.className = `pipeline-badge ${data.status}`;
+
+    // Update metadata
+    triggerText.textContent = `Trigger: ${data.trigger}`;
+    
+    if (data.last_run && data.last_run !== "Never") {
+        try {
+            const date = new Date(data.last_run);
+            timeText.textContent = `Last Run: ${date.toLocaleTimeString()} ${date.toLocaleDateString()}`;
+        } catch {
+            timeText.textContent = `Last Run: ${data.last_run}`;
+        }
+    } else {
+        timeText.textContent = "Last Run: Never";
+    }
+
+    container.innerHTML = "";
+    data.stages.forEach(stage => {
+        const step = document.createElement("div");
+        step.className = `pipeline-step ${stage.status}`;
+
+        const duration = stage.duration_seconds > 0 ? `${stage.duration_seconds}s` : "";
+        
+        step.innerHTML = `
+            <div class="pipeline-step-node"></div>
+            <div class="pipeline-step-header">
+                <span class="pipeline-step-name">${stage.name}</span>
+                <span class="pipeline-step-duration">${duration}</span>
+            </div>
+            <div class="pipeline-step-details">${stage.details}</div>
+        `;
+        container.appendChild(step);
+    });
 }

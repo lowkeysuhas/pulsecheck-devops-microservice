@@ -1,4 +1,4 @@
-name: PulseCheck CI Pipeline
+name: PulseCheck CI/CD Pipeline
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: Run Python Diagnostics and Tests
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -30,10 +31,13 @@ jobs:
         python -m py_compile app/main.py app/tests/test_main.py
 
     - name: Run PyTest Suite
+      env:
+        PYTHONPATH: .
       run: |
-        pytest app/tests/test_main.py -v
+        python -m pytest app/tests/test_main.py -v
 
-  docker-build:
+  docker-build-dry-run:
+    name: Verify Docker Container Build
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -50,3 +54,43 @@ jobs:
         file: ./Dockerfile
         push: false
         tags: pulsecheck:latest
+
+  deploy:
+    name: Build, Push and Deploy to AWS Fargate
+    needs: test
+    runs-on: ubuntu-latest
+    # Only run deploy on successful push to main/master branches, not on PRs
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Log in to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Build, Tag, and Push Image to ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build image with both SHA tag and latest tag
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: Deploy to Amazon ECS Fargate Service
+      run: |
+        # Trigger ECS service redeployment with the newly pushed latest container image
+        aws ecs update-service --cluster ${{ secrets.ECS_CLUSTER }} --service ${{ secrets.ECS_SERVICE }} --force-new-deployment --region ${{ secrets.AWS_REGION }}

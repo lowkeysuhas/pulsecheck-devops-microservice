@@ -60,12 +60,44 @@ async def check_service(client: httpx.AsyncClient, service: Dict[str, Any]) -> D
             "error": str(type(e).__name__)
         }
 
+import os
+import json
+
 @app.get("/", response_class=HTMLResponse)
 async def get_dashboard(request: Request):
     """
     Renders the PulseCheck premium dashboard.
     """
     return templates.TemplateResponse(request=request, name="index.html")
+
+@app.get("/api/pipeline")
+async def get_pipeline_status():
+    """
+    Serves the current pipeline execution state from pipeline_status.json
+    or falls back to a pending state if the file does not exist.
+    """
+    file_path = "app/static/pipeline_status.json"
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, "r", encoding="utf-8-sig") as f:
+                return json.load(f)
+        except Exception:
+            pass
+            
+    # Default status if pipeline has not been executed locally yet
+    return {
+        "status": "idle",
+        "last_run": "Never",
+        "trigger": "Manual or Push Trigger Pending",
+        "stages": [
+            { "name": "Virtual Env & Dependencies", "status": "pending", "details": "Not run yet. Execute run_pipeline.ps1 to start.", "duration_seconds": 0 },
+            { "name": "Syntax Validation", "status": "pending", "details": "Not run yet. Execute run_pipeline.ps1 to start.", "duration_seconds": 0 },
+            { "name": "PyTest Unit Suite", "status": "pending", "details": "Not run yet. Execute run_pipeline.ps1 to start.", "duration_seconds": 0 },
+            { "name": "Docker Compilation", "status": "pending", "details": "Not run yet. Execute run_pipeline.ps1 to start.", "duration_seconds": 0 },
+            { "name": "Container Deploy & Probe", "status": "pending", "details": "Not run yet. Execute run_pipeline.ps1 to start.", "duration_seconds": 0 }
+        ]
+    }
+
 
 @app.get("/health")
 async def get_health() -> Dict[str, Any]:

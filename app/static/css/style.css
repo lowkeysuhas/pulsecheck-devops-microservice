@@ -811,3 +811,207 @@ input:checked + .slider:before {
         text-align: left;
     }
 }
+
+/* Pipeline Visualizer Styles */
+.pipeline-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.pipeline-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.pipeline-status-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pipeline-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.pipeline-badge {
+    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.pipeline-badge.idle {
+    background-color: rgba(148, 163, 184, 0.1);
+    color: var(--text-secondary);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.pipeline-badge.in_progress {
+    background-color: rgba(0, 242, 254, 0.1);
+    color: var(--accent-cyan);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    box-shadow: var(--shadow-cyan);
+    animation: flashLED 1s infinite alternate;
+}
+
+.pipeline-badge.success {
+    background-color: rgba(0, 245, 160, 0.1);
+    color: var(--accent-green);
+    border: 1px solid rgba(0, 245, 160, 0.3);
+    box-shadow: var(--shadow-green);
+}
+
+.pipeline-badge.failed {
+    background-color: rgba(255, 51, 102, 0.1);
+    color: var(--accent-red);
+    border: 1px solid rgba(255, 51, 102, 0.3);
+    box-shadow: var(--shadow-red);
+}
+
+.pipeline-trigger-info {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.pipeline-trigger-info span {
+    font-family: var(--font-sans);
+}
+
+.pipeline-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.pipeline-flow::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 4px;
+    bottom: 8px;
+    width: 2px;
+    background-color: var(--border-color);
+    z-index: 0;
+}
+
+.pipeline-step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 1;
+}
+
+.pipeline-step-node {
+    position: absolute;
+    left: -15px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #1e293b;
+    border: 2px solid var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.pipeline-step.success .pipeline-step-node {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+    box-shadow: var(--shadow-green);
+}
+
+.pipeline-step.failed .pipeline-step-node {
+    background-color: var(--accent-red);
+    border-color: var(--accent-red);
+    box-shadow: var(--shadow-red);
+}
+
+.pipeline-step.in_progress .pipeline-step-node {
+    background-color: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+    box-shadow: var(--shadow-cyan);
+    animation: flashLED 1s infinite alternate;
+}
+
+.pipeline-step.pending .pipeline-step-node {
+    background-color: #1e293b;
+    border-color: var(--text-muted);
+}
+
+.pipeline-step-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pipeline-step-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.pipeline-step.in_progress .pipeline-step-name {
+    color: var(--accent-cyan);
+}
+
+.pipeline-step.success .pipeline-step-name {
+    color: var(--text-primary);
+}
+
+.pipeline-step.failed .pipeline-step-name {
+    color: var(--accent-red);
+}
+
+.pipeline-step-duration {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+.pipeline-step-details {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.pipeline-step.failed .pipeline-step-details {
+    color: var(--accent-red);
+    opacity: 0.9;
+}
+
+/* Graceful skip/warning status styles */
+.pipeline-badge.warning {
+    background-color: rgba(255, 159, 67, 0.1);
+    color: var(--accent-orange);
+    border: 1px solid rgba(255, 159, 67, 0.3);
+}
+
+.pipeline-step.warning .pipeline-step-node {
+    background-color: var(--accent-orange);
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 8px rgba(255, 159, 67, 0.4);
+}
+
+.pipeline-step.warning .pipeline-step-name {
+    color: var(--accent-orange);
+}
+
+.pipeline-step.warning .pipeline-step-details {
+    color: var(--text-secondary);
+    opacity: 0.8;
+}
+
+
