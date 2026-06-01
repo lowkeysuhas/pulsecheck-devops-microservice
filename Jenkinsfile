@@ -44,8 +44,12 @@ pipeline {
                     docker run -d -p 8085:8000 --name pulsecheck_test_jenkins ${IMAGE_NAME}:${IMAGE_TAG}
                     sleep 5
                     
-                    # Call API probe
-                    curl -f http://localhost:8085/health
+                     # Extract the container IP address dynamically
+                    CONTAINER_IP=\$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pulsecheck_test_jenkins)
+                    echo "Probing container at IP: \${CONTAINER_IP}"
+                    
+                    # Call API probe using the container's network IP and port 8000
+                    curl -f http://\${CONTAINER_IP}:8000/health
                 """
             }
                         post {
