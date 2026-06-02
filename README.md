@@ -164,11 +164,24 @@ Once deployed, the Load Balancer DNS endpoint is exported under `ServiceUrl` out
 ## 2. Application Running Locally.
 <img width="1870" height="958" alt="image" src="https://github.com/user-attachments/assets/e505e8c7-572d-4f73-add4-5d857dfb42ee" />
 <img width="1543" height="583" alt="image" src="https://github.com/user-attachments/assets/cf8aeb00-c295-40af-9cad-8d85668e61fe" />
-## 3. Output upon performing diagnosis - JSON output.
+## 3. Container Image on Docker.
+<img width="1603" height="526" alt="image" src="https://github.com/user-attachments/assets/0eb727b4-d1dc-4ca8-af1a-7991c71bab4e" />
+## 4. CI/CD pipleline runing locally and on Jenkins.
+<img width="753" height="664" alt="Screenshot 2026-06-02 125843" src="https://github.com/user-attachments/assets/11f73f4c-3625-40ca-a1c7-6360d88b4811" />
+<img width="1882" height="973" alt="image" src="https://github.com/user-attachments/assets/52d04d6d-8eb6-4d79-9bc7-edc32cc4bad4" />
+## 4. Output upon performing diagnosis - JSON output.
 <img width="1912" height="453" alt="image" src="https://github.com/user-attachments/assets/8d1e8a57-9910-4820-b721-31da72ed62f7" />
-## 4. Developer's Dashboard.
+## 5. Developer's Dashboard.
 <img width="1548" height="575" alt="image" src="https://github.com/user-attachments/assets/f0eb2189-6a9e-40ea-8c5e-40df1628bed9" />
 <img width="897" height="903" alt="image" src="https://github.com/user-attachments/assets/2eef46ca-0720-45c5-bc18-eefce849be77" />
 <img width="897" height="902" alt="image" src="https://github.com/user-attachments/assets/a0ccd280-fba3-41ec-83b8-a97c4b9d8d1e" />
 <img width="897" height="902" alt="image" src="https://github.com/user-attachments/assets/a0ccd280-fba3-41ec-83b8-a97c4b9d8d1e" />
+---
+# Demo Video 
+A 3 minute video demo explaining the technologies integrated into the project.
+
+https://github.com/user-attachments/assets/4266e73e-13e0-42a8-b3cf-deb12aca1412
+
+
+
 
