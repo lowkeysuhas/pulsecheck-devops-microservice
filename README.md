@@ -177,6 +177,7 @@ Once deployed, the Load Balancer DNS endpoint is exported under `ServiceUrl` out
 <img width="897" height="902" alt="image" src="https://github.com/user-attachments/assets/a0ccd280-fba3-41ec-83b8-a97c4b9d8d1e" />
 <img width="897" height="902" alt="image" src="https://github.com/user-attachments/assets/a0ccd280-fba3-41ec-83b8-a97c4b9d8d1e" />
 ---
+
 # Demo Video 
 A 3 minute video demo explaining the technologies integrated into the project.
 
